@@ -1,4 +1,4 @@
-
+set (CMAKE_CXX_STANDARD 11)
 
 set(SOURCES
     main.cpp

@@ -2,11 +2,16 @@
 #include "../src/Elastos.Wallet.Utility.h"
 
 #include <iostream>
+#include <string>
+#include <string.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "nlohmann/json.hpp"
 
 #include "../src/Utils.h"
+#include "../src/BRInt.h"
+#include "../src/BRBIP39WordsEn.h"
 
 char* readMnemonicFile(const char* path)
 {
@@ -69,7 +74,7 @@ void TestGenrateMnemonic()
 {
     printf("============= start TestGenrateMnemonic ===========\n");
 
-    const char* path = "/home/hostuser/Elastos.ORG.Wallet.Lib.C/src/Data/mnemonic_chinese.txt";
+    const char* path = "/home/datascience/elastos/Elastos.ORG.Wallet.Lib.C/src/Data/mnemonic_chinese.txt";
     char* words = readMnemonicFile(path);
     if (!words) {
         printf("read file failed\n");
@@ -119,11 +124,149 @@ void TestGenrateMnemonic()
     printf("============= end TestGenrateMnemonic ===========\n\n");
 }
 
+void TestGenrateMnemonicEn()
+{
+    printf("============= start TestGenrateMnemonicEn ===========\n");
+
+    //char* mnemonic = generateMnemonic("english", *BRBIP39WordsEn);
+    //char* mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
+    char* mnemonic = "obtain pill nest sample caution stone candy habit silk husband give net";
+    printf("mnemonic: %s\n", mnemonic);
+
+    void* seed;
+    int seedLen = getSeedFromMnemonic(&seed, mnemonic, "english", *BRBIP39WordsEn, "");
+    printf("--- %d ---\nseed: ", seedLen);
+    UInt512 useed = *(UInt512 *) seed;
+    std::cout << Utils::UInt512ToString(useed) << std::endl;
+
+    char* privateKey = getSinglePrivateKey(seed, seedLen);
+    char* publicKey = getSinglePublicKey(seed, seedLen);
+
+    printf("private key: %s\n", privateKey);
+    printf("public key: %s\n", publicKey);
+
+    char* address = getAddress(publicKey);
+    printf("address: %s\n", address);
+
+    uint8_t data[] = {0, 1, 2, 3, 4, 5};
+    uint8_t* signedData;
+    int signedLen = sign(privateKey, data, sizeof(data), (void**)&signedData);
+    printf("signed len: %d\n", signedLen);
+    if (signedLen > 0) {
+        printf("============= verify by public key ===========\n");
+        bool bVerify = verify(publicKey, data, sizeof(data), signedData, signedLen);
+        if (bVerify) {
+            printf("============= verify succeeded ===========\n");
+        }
+        else {
+            printf("============= verify failed ===========\n");
+        }
+    }
+    else {
+
+        printf("============= sign failed ===========\n");
+    }
+
+    //free(mnemonic);
+    free(privateKey);
+    free(publicKey);
+    free(address);
+    free(seed);
+    //free(words);
+
+    printf("============= end TestGenrateMnemonicEn ===========\n\n");
+}
+
+void TestHDWalletAddressEn()
+{
+    printf("============= start TestHDWalletAddressEn ===========\n");
+
+    const char* path = "/home/datascience/elastos/Elastos.ORG.Wallet.Lib.C/src/Data/mnemonic_chinese.txt";
+    char* words = readMnemonicFile(path);
+    if (!words) {
+        printf("read file failed\n");
+        printf("============= end TestHDWalletAddress ===========\n\n");
+        return;
+    }
+
+    //const char* mnemonic = "督 辉 稿 谋 速 壁 阿 耗 瓷 仓 归 说";
+    const char* mnemonic = "merge junk hybrid lottery river amazing loyal drip zoo diagram into castle";
+    //const char* mnemonic = "obtain pill nest sample caution stone candy habit silk husband give net";
+    printf("mnemonic: %s\n", mnemonic);
+
+    void* seed;
+    int seedLen = getSeedFromMnemonic(&seed, mnemonic, "english", *BRBIP39WordsEn, "");
+    printf("=========== seed length: %d\n", seedLen);
+    printf("--- %d ---\nseed: ", seedLen);
+    UInt512 useed = *(UInt512 *) seed;
+    std::cout << Utils::UInt512ToString(useed) << std::endl;
+
+    char* privateKey = getSinglePrivateKey(seed, seedLen);
+    char* publicKey = getSinglePublicKey(seed, seedLen);
+    char* address = getAddress(publicKey);
+
+    printf("single private key: %s\n", privateKey);
+    printf("single public key: %s\n", publicKey);
+    printf("single address: %s\n\n", address);
+
+    free(privateKey);
+    free(publicKey);
+    free(address);
+    free(words);
+
+    MasterPublicKey* masterPublicKey = getMasterPublicKey(seed, seedLen, COIN_TYPE_ELA);
+
+    printf("masterPublicKey->fingerPrint: %" PRIu32 "\n", masterPublicKey->fingerPrint);
+    printf("sizeof(masterPublicKey->chainCode): %d\n", sizeof(masterPublicKey->chainCode));
+    printf("sizeof(masterPublicKey->publicKey): %d\n", sizeof(masterPublicKey->publicKey));
+    std::cout << "Hex(masterPublicKey->chainCode): " << Utils::encodeHex(masterPublicKey->chainCode, sizeof(masterPublicKey->chainCode)) << std::endl;
+    std::cout << "Hex(masterPublicKey->publicKey): " << Utils::encodeHex(masterPublicKey->publicKey, sizeof(masterPublicKey->publicKey)) << std::endl;
+    printf("\n");
+/*
+    uint8_t* chainCode = masterPublicKey->chainCode;
+    uint8_t* pubKey = masterPublicKey->publicKey;
+    printf("%d\n", sizeof(chainCode));
+    printf("%d\n", sizeof(pubKey));
+    printf("%s\n", Utils::encodeHex(chainCode, sizeof(chainCode)));
+    printf("%s\n", Utils::encodeHex(pubKey, sizeof(pubKey)));
+    for (int c = 0; c < sizeof(chainCode); c++) {
+        printf("%" PRIu8, chainCode[c]);
+    }
+    printf("\n");
+    for (int p = 0; p < sizeof(pubKey); p++) {
+        printf("%" PRIu8, pubKey[p]);
+    }
+    printf("\n");
+*/
+    int count = 10;
+    char* privateKeys[count];
+    char* publicKeys[count];
+    char* addresses[count];
+    for (int i = 0; i < count; i++) {
+        privateKeys[i] = generateSubPrivateKey(seed, seedLen, COIN_TYPE_ELA, EXTERNAL_CHAIN, i);
+        publicKeys[i] = generateSubPublicKey(masterPublicKey, EXTERNAL_CHAIN, i);
+        addresses[i] = getAddress(publicKeys[i]);
+
+        printf("private key %d: %s\n", i, privateKeys[i]);
+        printf("public key %d: %s\n", i, publicKeys[i]);
+        printf("address %d: %s\n\n", i, addresses[i]);
+    }
+
+    for (int i = 0; i < count; i++) {
+        free(privateKeys[i]);
+        free(publicKeys[i]);
+        free(addresses[i]);
+    }
+    delete masterPublicKey;
+
+    printf("============= end TestHDWalletAddressEn ===========\n");
+}
+
 void TestHDWalletAddress()
 {
     printf("============= start TestHDWalletAddress ===========\n");
 
-    const char* path = "/home/hostuser/Elastos.ORG.Wallet.Lib.C/src/Data/mnemonic_chinese.txt";
+    const char* path = "/home/datascience/elastos/Elastos.ORG.Wallet.Lib.C/src/Data/mnemonic_chinese.txt";
     char* words = readMnemonicFile(path);
     if (!words) {
         printf("read file failed\n");
@@ -148,7 +291,6 @@ void TestHDWalletAddress()
     free(publicKey);
     free(address);
     free(words);
-
 
     MasterPublicKey* masterPublicKey = getMasterPublicKey(seed, seedLen, COIN_TYPE_ELA);
     int count = 10;
@@ -179,7 +321,7 @@ void TestDid()
 {
     printf("============= start TestDid ===========\n");
 
-    const char* path = "/home/hostuser/Elastos.ORG.Wallet.Lib.C/src/Data/mnemonic_chinese.txt";
+    const char* path = "/home/datascience/elastos/Elastos.ORG.Wallet.Lib.C/src/Data/mnemonic_chinese.txt";
     char* words = readMnemonicFile(path);
     if (!words) {
         printf("read file failed\n");
@@ -276,6 +418,7 @@ void cosignTxData()
 
 const char *c_help = \
     "genmne    test generate mnemonic, get private key, public key, address.\n" \
+    "gen       test generate english mnemonic, get private key, public key, address.\n" \
     "hd        test generate hd wallet address.\n" \
     "did       test generate did.\n"
     "sign      test generate raw transaction.\n" \
@@ -294,8 +437,11 @@ int main(int argc, char *argv[])
         if (!command.compare("genmne")) {
             TestGenrateMnemonic();
         }
+        else if (!command.compare("gen")) {
+            TestGenrateMnemonicEn();
+        }
         else if (!command.compare("hd")) {
-            TestHDWalletAddress();
+            TestHDWalletAddressEn();
         }
         else if (!command.compare("did")) {
             TestDid();
