@@ -10,6 +10,8 @@
 #include "BigIntegerLibrary.hh"
 #include "BRKey.h"
 #include "log.h"
+#include <iostream>
+
 
 struct {
     bool operator()(const std::string &a, const std::string &b) const
@@ -27,6 +29,10 @@ struct {
             printf("Public key: %s decode error\n", b.c_str());
         }
         BigInteger bigIntB = dataToBigInteger(pk.data, sizeof(pk.data) / 2, BigInteger::Sign::positive);
+
+        printf("=== ElaController operator ===\n");
+        std::cout << bigIntA << "\n";
+        std::cout << bigIntB << "\n";
 
         return bigIntA <= bigIntB;
     }
@@ -67,6 +73,7 @@ std::string ElaController::genRawTransaction(const std::string jsonStr)
 
     ByteStream ostream;
     transaction->Serialize(ostream);
+    std::cout << transaction->ToJson().dump(4) << std::endl;
     delete transaction;
 
     return Utils::encodeHex(ostream.getBuffer());
@@ -79,8 +86,11 @@ CMBlock ElaController::GenerateRedeemScript(std::vector<std::string> publicKeys,
 
     ByteStream stream;
     stream.writeUint8(uint8_t(OP_1 + requiredSignCount - 1));
+
     for (size_t i = 0; i < sortedSigners.size(); i++) {
+
         CMBlock pubKey = Utils::decodeHex(sortedSigners[i]);
+
         stream.writeUint8(uint8_t(pubKey.GetSize()));
         stream.writeBytes(pubKey, pubKey.GetSize());
     }

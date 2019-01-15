@@ -104,6 +104,7 @@ ECDSA65Sign_sha256(const void *privKey, size_t privKeyLen, const UInt256 *md, vo
                     const BIGNUM *r = NULL;
                     const BIGNUM *s = NULL;
                     ECDSA_SIG_get0(sig, &r, &s);
+                    printf("r is %X and s is %X\n", &r, &s);
                     int nBitsR = BN_num_bits(r);
                     int nBitsS = BN_num_bits(s);
                     if (nBitsR <= 256 && nBitsS <= 256) {

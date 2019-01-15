@@ -330,6 +330,8 @@ MasterPublicKey* getIdChainMasterPublicKey(const void* seed, int seedLen)
     BRKey idMasterKey;
     UInt256 idChainCode;
     BRBIP32PrivKeyPath(&idMasterKey, &idChainCode, &seed, sizeof(seed), 1, 0 | BIP32_HARD);
+    printf("=== idMasterKey.pubKey ===\n");
+    std::cout << idMasterKey.pubKey << std::endl;
 
     MasterPublicKey* masterKey = getMasterPublicKey(idMasterKey, idChainCode);
 
@@ -386,6 +388,8 @@ char* getDid(const char* publicKey)
 
 static std::string opToString(char* publicKey)
 {
+    printf("=== opToString - publicKey ===\n");
+    std::cout << std::string(publicKey, strlen(publicKey)) << std::endl;
     return std::string(publicKey, strlen(publicKey));
 }
 

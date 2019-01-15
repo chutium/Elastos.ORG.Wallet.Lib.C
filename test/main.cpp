@@ -1,4 +1,3 @@
-
 #include "../src/Elastos.Wallet.Utility.h"
 
 #include <iostream>
@@ -41,9 +40,13 @@ void SignMemo()
 {
     // const char* memo = "{\"userId\":\"clark\",\"phone\":\"13809011232\"}";
     const char* memo = "68656C6C6F776F726C64";
-    const char* privateKey = "1615CC0AB02168680354E07048F9CE54B2921847F68453586C4A2DBC23BA2C9D";
+    std::cout << "data: " << Utils::hexToString(memo) << std::endl;
+    const char* privateKey = "0eb7aa4fa4053475f6106f8914cbbb3883b7e96b344de12817a851a1beb63d9b";
+    printf("Private Key: %s\n", privateKey);
+    printf("Public Key:  %s\n", getPublicKeyFromPrivateKey(privateKey));
 
     CMBlock data = Utils::decodeHex(memo);
+    std::cout << "CMBlock to string: " << Utils::convertToString(data) << std::endl;
 
     // CMBlock data = Utils::convertToMemBlock(memo);
     uint8_t* signedData;
@@ -333,10 +336,15 @@ void TestDid()
     void* seed;
     int seedLen = getSeedFromMnemonic(&seed, mnemonic, "chinese", words, "");
     printf("=========== seed length: %d\n", seedLen);
+    UInt512 useed = *(UInt512 *) seed;
+    std::cout << Utils::UInt512ToString(useed) << std::endl;
+
     free(words);
 
 
     MasterPublicKey* masterPublicKey = getIdChainMasterPublicKey(seed, seedLen);
+    std::cout << "Hex(masterPublicKey->publicKey): " << Utils::encodeHex(masterPublicKey->publicKey, sizeof(masterPublicKey->publicKey)) << std::endl;
+
     int count = 10;
     char* privateKeys[count];
     char* publicKeys[count];
@@ -361,16 +369,19 @@ void TestDid()
     printf("============= end TestDid ===========\n");
 }
 
-void signTxData(const char* data)
+//void signTxData(const char* data)
+void signTxData()
 {
     printf("============= start signTxData ===========\n");
-    // const char* transaction = "{\"Transactions\":[{\"UTXOInputs\":[{\
-    //                 \"txid\":\"f176d04e5980828770acadcfc3e2d471885ab7358cd7d03f4f61a9cd0c593d54\",\
-    //                 \"privateKey\":\"b6f010250b6430b2dd0650c42f243d5445f2044a9c2b6975150d8b0608c33bae\",\
-    //                 \"index\":0,\"address\":\"EeniFrrhuFgQXRrQXsiM1V4Amdsk4vfkVc\"}],\
-    //                 \"Outputs\":[{\"address\":\"EbxU18T3M9ufnrkRY7NLt6sKyckDW4VAsA\",\
-    //                 \"amount\":2000000}]}]}";
-    char* signedData = generateRawTransaction(data);
+    const char* transaction = "{\"Transactions\":[{\"UTXOInputs\":[{\
+                    \"txid\":\"f176d04e5980828770acadcfc3e2d471885ab7358cd7d03f4f61a9cd0c593d54\",\
+                    \"privateKey\":\"b6f010250b6430b2dd0650c42f243d5445f2044a9c2b6975150d8b0608c33bae\",\
+                    \"index\":0,\"address\":\"EeniFrrhuFgQXRrQXsiM1V4Amdsk4vfkVc\"}],\
+                    \"Outputs\":[{\"address\":\"EbxU18T3M9ufnrkRY7NLt6sKyckDW4VAsA\",\
+                    \"amount\":2000000}]}]}";
+    printf("tx:\n");
+    std::cout << nlohmann::json::parse(transaction).dump(4) << std::endl;
+    char* signedData = generateRawTransaction(transaction);
     printf("signedData: %s\n", signedData);
 
     free(signedData);
@@ -428,7 +439,37 @@ const char *c_help = \
     "\n";
 
 int main(int argc, char *argv[])
-{
+{/*
+    printf("Public Key: %s\n", getPublicKeyFromPrivateKey("0eb7aa4fa4053475f6106f8914cbbb3883b7e96b344de12817a851a1beb63d9b"));
+    std::string pk;
+    std::cout << "Private Key?" << std::endl;
+    getline(std::cin, pk);
+    const char* privateKey = pk.c_str();
+
+    char* publicKey = getPublicKeyFromPrivateKey(privateKey);
+    printf("Public Key: %s\n", publicKey);
+
+    char* address = getAddress(publicKey);
+    printf("Address: %s\n", address);
+
+    std::string msg;
+    std::cout << "Message?" << std::endl;
+    getline(std::cin, msg);
+
+    std::string memo = Utils::stringToHex(msg);
+    std::cout << "Hex Memo: " << memo << std::endl;
+    CMBlock data = Utils::decodeHex(memo.c_str());
+    std::cout << "CMBlock to string: " << Utils::convertToString(data) << std::endl;
+
+    uint8_t* signedData;
+    int signedLen = sign(privateKey, (void*)data, data.GetSize(), (void**)&signedData);
+
+    CMBlock cmSigned;
+    cmSigned.SetMemFixed(signedData, signedLen);
+    std::string signedStr = Utils::encodeHex(cmSigned);
+
+    printf("Signed: %s\n", signedStr.c_str());
+*/
     std::cout << "input command: ";
     while(1)
     {
@@ -449,8 +490,9 @@ int main(int argc, char *argv[])
         else if (!command.compare("sign")) {
             std::string json;
             std::cout << "input trasaction data: ";
-            std::getline(std::cin, json);
-            signTxData(json.c_str());
+            // std::getline(std::cin, json);
+            // signTxData(json.c_str());
+            signTxData();
         }
         else if (!command.compare("cosign")) {
             cosignTxData();

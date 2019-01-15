@@ -312,10 +312,19 @@ std::string Utils::encodeHex(const CMBlock &in) {
 CMBlock Utils::decodeHex(const std::string &s) {
     size_t dataLen = 0;
     char *str = const_cast<char *>(s.c_str());
+    printf("str: %s\n", str);
     uint8_t *data = decodeHexCreate(&dataLen, str, strlen(str));
-
+/*
+    printf("encodeHex: %s\n", Utils::encodeHex(data, sizeof(data)));
+    for (int c = 0; c < sizeof(data); c++) {
+        printf("%" PRIu8, data[c]);
+    }
+    printf("\n");
+*/
     CMBlock ret;
     ret.SetMem(data, dataLen);
+
+    std::cout << "CMBlock: " << Utils::encodeHex(ret) << std::endl;
 
     return ret;
 }
@@ -342,4 +351,43 @@ void Utils::printBinary(unsigned char* data, int len)
         printf("%d ", c);
     }
     printf("\n");
+}
+
+std::string Utils::hexToString(const std::string &input)
+{
+    static const char* const lut = "0123456789ABCDEF";
+    size_t len = input.length();
+    if (len & 1) throw std::invalid_argument("odd length");
+
+    std::string output;
+    output.reserve(len / 2);
+    for (size_t i = 0; i < len; i += 2)
+    {
+        char a = input[i];
+        const char* p = std::lower_bound(lut, lut + 16, a);
+        if (*p != a) throw std::invalid_argument("not a hex digit");
+
+        char b = input[i + 1];
+        const char* q = std::lower_bound(lut, lut + 16, b);
+        if (*q != b) throw std::invalid_argument("not a hex digit");
+
+        output.push_back(((p - lut) << 4) | (q - lut));
+    }
+    return output;
+}
+
+std::string Utils::stringToHex(const std::string &input)
+{
+    static const char* const lut = "0123456789ABCDEF";
+    size_t len = input.length();
+
+    std::string output;
+    output.reserve(2 * len);
+    for (size_t i = 0; i < len; ++i)
+    {
+        const unsigned char c = input[i];
+        output.push_back(lut[c >> 4]);
+        output.push_back(lut[c & 15]);
+    }
+    return output;
 }

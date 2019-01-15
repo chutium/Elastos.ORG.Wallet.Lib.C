@@ -98,6 +98,10 @@ public:
     static CMBlock getCode(const CMBlock& publicKey, int signType = 0xAC);
 
     static void printBinary(unsigned char* data, int len);
+
+    static std::string hexToString(const std::string &input);
+
+    static std::string stringToHex(const std::string &input);
 };
 
 #endif //__SDK_UTILS_H__
