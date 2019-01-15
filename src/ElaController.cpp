@@ -12,7 +12,6 @@
 #include "log.h"
 #include <iostream>
 
-
 struct {
     bool operator()(const std::string &a, const std::string &b) const
     {

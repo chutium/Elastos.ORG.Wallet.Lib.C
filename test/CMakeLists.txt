@@ -1,8 +1,6 @@
 set (CMAKE_CXX_STANDARD 11)
 
-set(SOURCES
-    main.cpp
-)
+file( GLOB SOURCES "*.cpp")
 
 add_executable(TestUtility ${SOURCES})
 
