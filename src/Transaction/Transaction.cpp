@@ -84,14 +84,14 @@ CMBlock Transaction::SignData(const CMBlock& privateKey)
     CMBlock data = ostream.getBuffer();
 
     printf("unsigned data: ");
-    Utils::printBinary(data, data.GetSize());
+    Utils::printBinaryHex(data, data.GetSize());
 
     CMBlock publicKey;
     publicKey.Resize(33);
     getPubKeyFromPrivKey(publicKey, (UInt256 *)(uint8_t *)privateKey);
 
     printf("sign public key: ");
-    Utils::printBinary(publicKey, publicKey.GetSize());
+    Utils::printBinaryHex(publicKey, publicKey.GetSize());
 
     CMBlock shaData(sizeof(UInt256));
     BRSHA256(shaData, data, data.GetSize());
@@ -102,7 +102,7 @@ CMBlock Transaction::SignData(const CMBlock& privateKey)
             (const UInt256 *) &shaData[0], signedData, signedData.GetSize());
 
     printf("signed data: ");
-    Utils::printBinary(signedData, signedData.GetSize());
+    Utils::printBinaryHex(signedData, signedData.GetSize());
     return signedData;
 }
 

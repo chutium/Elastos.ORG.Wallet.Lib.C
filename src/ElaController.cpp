@@ -60,6 +60,7 @@ std::string ElaController::genRawTransaction(const std::string jsonStr)
     if (!transaction) {
         return nullptr;
     }
+    std::cout << transaction->ToJson().dump(4) << std::endl;
 
     std::vector<CMBlock> privateKeys = transaction->GetPrivateKeys();
     if (privateKeys.size() == 0) {

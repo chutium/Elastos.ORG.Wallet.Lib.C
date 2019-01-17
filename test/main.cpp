@@ -373,12 +373,34 @@ void TestDid()
 void signTxData()
 {
     printf("============= start signTxData ===========\n");
-    const char* transaction = "{\"Transactions\":[{\"UTXOInputs\":[{\
+    const char* transaction = "{\"Transactions\":[{\"UTXOInputs\":[{\"privateKey\":\"492F67D441F563AA4746497EB77C89906A3D3C06B242030BA966BC5604482EF7\",\"address\":\"EJonBz8U1gYnANjSafRF9EAJW9KTwRKd6x\",\"txid\":\"5d66b87a7828a2228033aea746ed3207be509655ddae7360723b903d5f03e9b0\",\"index\":0}],\"Fee\":4860,\"Outputs\":[{\"amount\":1000,\"address\":\"EbunxcqXie6UExs5SXDbFZxr788iGGvAs9\"},{\"amount\":999994140,\"address\":\"EJonBz8U1gYnANjSafRF9EAJW9KTwRKd6x\"}]}]}";
+
+/*"{\"Transactions\":[{\"UTXOInputs\":[{\
                     \"txid\":\"f176d04e5980828770acadcfc3e2d471885ab7358cd7d03f4f61a9cd0c593d54\",\
                     \"privateKey\":\"b6f010250b6430b2dd0650c42f243d5445f2044a9c2b6975150d8b0608c33bae\",\
                     \"index\":0,\"address\":\"EeniFrrhuFgQXRrQXsiM1V4Amdsk4vfkVc\"}],\
                     \"Outputs\":[{\"address\":\"EbxU18T3M9ufnrkRY7NLt6sKyckDW4VAsA\",\
-                    \"amount\":2000000}]}]}";
+                    \"amount\":2000000}]}]}"*/
+    printf("tx:\n");
+    std::cout << nlohmann::json::parse(transaction).dump(4) << std::endl;
+    char* signedData = generateRawTransaction(transaction);
+    printf("signedData: %s\n", signedData);
+
+    free(signedData);
+    printf("============= end signTxData ===========\n\n");
+}
+
+void signTxMemo()
+{
+    printf("============= start signTxData ===========\n");
+    const char* transaction = "{\"Transactions\":[{\"UTXOInputs\":[{\"privateKey\":\"492F67D441F563AA4746497EB77C89906A3D3C06B242030BA966BC5604482EF7\",\"address\":\"EJonBz8U1gYnANjSafRF9EAJW9KTwRKd6x\",\"txid\":\"928f709263f50d613b40587c81ce0196d8f3b07535641aa1bfb0f08edc6618da\",\"index\":0}],\"Fee\":4860,\"Memo\":\"test a test\",\"Outputs\":[{\"amount\":1000,\"address\":\"EbunxcqXie6UExs5SXDbFZxr788iGGvAs9\"},{\"amount\":999994140,\"address\":\"EJonBz8U1gYnANjSafRF9EAJW9KTwRKd6x\"}]}]}";
+
+/*"{\"Transactions\":[{\"UTXOInputs\":[{\
+                    \"txid\":\"f176d04e5980828770acadcfc3e2d471885ab7358cd7d03f4f61a9cd0c593d54\",\
+                    \"privateKey\":\"b6f010250b6430b2dd0650c42f243d5445f2044a9c2b6975150d8b0608c33bae\",\
+                    \"index\":0,\"address\":\"EeniFrrhuFgQXRrQXsiM1V4Amdsk4vfkVc\"}],\
+                    \"Outputs\":[{\"address\":\"EbxU18T3M9ufnrkRY7NLt6sKyckDW4VAsA\",\
+                    \"amount\":2000000}]}]}"*/
     printf("tx:\n");
     std::cout << nlohmann::json::parse(transaction).dump(4) << std::endl;
     char* signedData = generateRawTransaction(transaction);
@@ -493,6 +515,9 @@ int main(int argc, char *argv[])
             // std::getline(std::cin, json);
             // signTxData(json.c_str());
             signTxData();
+        }
+        else if (!command.compare("signmemo")) {
+            signTxMemo();
         }
         else if (!command.compare("cosign")) {
             cosignTxData();

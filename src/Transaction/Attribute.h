@@ -24,10 +24,13 @@ public:
     {
         if (memo.empty()) {
             mUsage = Usage::Nonce;
-            mData = Utils::convertToMemBlock(std::to_string(std::rand()));
+            std::string rand = std::to_string(std::rand());
+            std::cout << rand << std::endl;
+            mData = Utils::convertToMemBlock(rand);
         }
         else {
             mUsage = Usage::Memo;
+            std::cout << memo << std::endl;
             mData = Utils::convertToMemBlock(memo);
         }
     }

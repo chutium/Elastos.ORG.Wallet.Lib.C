@@ -99,9 +99,13 @@ public:
 
     static void printBinary(unsigned char* data, int len);
 
+    static void printBinaryHex(unsigned char* data, int len);
+
     static std::string hexToString(const std::string &input);
 
     static std::string stringToHex(const std::string &input);
+
+    static std::string binaryToHex(unsigned char* input, int len);
 };
 
 #endif //__SDK_UTILS_H__
