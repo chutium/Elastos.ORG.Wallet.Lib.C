@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "../src/Utils.h"
+#include "../src/BRBIP39WordsEn.h"
 
 char* readMnemonicFile(const char* path)
 {
@@ -67,7 +68,7 @@ void verifyMemo()
 void TestGenrateMnemonic()
 {
     printf("============= start TestGenrateMnemonic ===========\n");
-
+/*
     const char* path = "/home/hostuser/Elastos.SDK.Keypair.C/src/Data/mnemonic_chinese.txt";
     char* words = readMnemonicFile(path);
     if (!words) {
@@ -80,6 +81,15 @@ void TestGenrateMnemonic()
 
     void* seed;
     int seedLen = getSeedFromMnemonic(&seed, mnemonic, "chinese", words, "");
+*/
+    char* mnemonic = "obtain pill nest sample caution stone candy habit silk husband give net";
+
+    void* seed;
+    int seedLen = getSeedFromMnemonic(&seed, mnemonic, "english", *BRBIP39WordsEn, "");
+    printf("--- %d ---\nseed: ", seedLen);
+    UInt512 useed = *(UInt512 *) seed;
+    std::cout << Utils::UInt512ToString(useed) << std::endl;
+
     char* privateKey = getSinglePrivateKey(seed, seedLen);
     char* publicKey = getSinglePublicKey(seed, seedLen);
 
@@ -108,12 +118,12 @@ void TestGenrateMnemonic()
         printf("============= sign failed ===========\n");
     }
 
-    free(mnemonic);
+    //free(mnemonic);
     free(privateKey);
     free(publicKey);
     free(address);
     free(seed);
-    free(words);
+    //free(words);
 
     printf("============= end TestGenrateMnemonic ===========\n\n");
 }
@@ -121,7 +131,7 @@ void TestGenrateMnemonic()
 void TestHDWalletAddress()
 {
     printf("============= start TestHDWalletAddress ===========\n");
-
+/*
     const char* path = "/home/hostuser/Elastos.SDK.Keypair.C/src/Data/mnemonic_chinese.txt";
     char* words = readMnemonicFile(path);
     if (!words) {
@@ -134,6 +144,17 @@ void TestHDWalletAddress()
     void* seed;
     int seedLen = getSeedFromMnemonic(&seed, mnemonic, "chinese", words, "");
     printf("=========== seed length: %d\n", seedLen);
+*/
+    const char* mnemonic = "obtain pill nest sample caution stone candy habit silk husband give net";
+    //const char* mnemonic = "obtain pill nest sample caution stone candy habit silk husband give net";
+    printf("mnemonic: %s\n", mnemonic);
+
+    void* seed;
+    int seedLen = getSeedFromMnemonic(&seed, mnemonic, "english", *BRBIP39WordsEn, "");
+    printf("=========== seed length: %d\n", seedLen);
+    printf("--- %d ---\nseed: ", seedLen);
+    UInt512 useed = *(UInt512 *) seed;
+    std::cout << Utils::UInt512ToString(useed) << std::endl;
 
     char* privateKey = getSinglePrivateKey(seed, seedLen);
     char* publicKey = getSinglePublicKey(seed, seedLen);
@@ -146,10 +167,10 @@ void TestHDWalletAddress()
     free(privateKey);
     free(publicKey);
     free(address);
-    free(words);
-
+    //free(words);
 
     MasterPublicKey* masterPublicKey = getMasterPublicKey(seed, seedLen, COIN_TYPE_ELA);
+    std::cout << "Master public key:\n" << Utils::encodeHex(masterPublicKey->publicKey, sizeof(masterPublicKey->publicKey)) << std::endl << std::endl;
     int count = 10;
     char* privateKeys[count];
     char* publicKeys[count];

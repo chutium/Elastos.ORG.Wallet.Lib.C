@@ -17,6 +17,8 @@
 class Utils {
 public:
 
+    static std::string UInt512ToString(const UInt512 &u512, bool reverse = false);
+
     static std::string UInt256ToString(const UInt256 &u256, bool reverse = false);
 
     static UInt256 UInt256FromString(const std::string &u256, bool reverse = false);

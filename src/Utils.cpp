@@ -18,10 +18,26 @@
 #include "ByteStream.h"
 // #include "Log.h"
 
+std::string Utils::UInt512ToString(const UInt512 &u512, bool reverse) {
+    std::stringstream ss;
+
+    if (!reverse) {
+        for (int i = 0; i < sizeof(u512.u8); ++i) {
+            ss << (char) _hexc(u512.u8[i] >> 4) << (char) _hexc(u512.u8[i]);
+        }
+    } else {
+        for (int i = sizeof(u512.u8) - 1; i >= 0; --i) {
+            ss << (char) _hexc(u512.u8[i] >> 4) << (char) _hexc(u512.u8[i]);
+        }
+    }
+
+     return ss.str();
+}
+
 std::string Utils::UInt256ToString(const UInt256 &u256, bool reverse) {
     std::stringstream ss;
 
-    if(!reverse) {
+    if (!reverse) {
         for (int i = 0; i < sizeof(u256.u8); ++i) {
             ss << (char) _hexc(u256.u8[i] >> 4) << (char) _hexc(u256.u8[i]);
         }
